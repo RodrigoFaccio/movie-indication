@@ -123,3 +123,23 @@ export const TitlePreferences = styled.h1`
 color: white;
 text-align: center;
 `
+export const Loading = styled.div`
+height: 1200px;
+width: 100%;
+
+background-color: white;
+
+display: flex;
+justify-content: center;
+align-items: center;
+align-content: center;
+
+z-index: 1;
+position: absolute;
+transform: translateZ(50px);
+`
+export const LoadingText = styled.h2`
+font-size: 40px;
+color: purple;
+margin-left: 50px;
+`
