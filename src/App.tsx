@@ -1,25 +1,41 @@
 import axios from 'axios';
 import React,{useEffect, useState} from 'react';
-import {Container,Image,Title,Description,Button, MovieContainer, Genres, Forms, Input, Label, PreferenceContainer, MoviePreferences, TitlePreferences} from './styles'
+import {Container,Image,Title,Description,Button, MovieContainer, Forms, Input, Label, PreferenceContainer, MoviePreferences, TitlePreferences} from './styles'
+import {AiOutlineLoading3Quarters} from 'react-icons/ai'
 
 
 interface dataMovie{
     original_title: string;
     poster_path: string;
-    overview:string;    
+    overview:string; 
     genres:[
-      Object
-      :{
-      name:string
-    }]
+      {
+      id:number;
+      name:string;
+      },   
+    ];
+  
     popularity: number;
     runtime: number;
+    vote_average: number;
+
 
 }
 function App() {
 const [movie,setMovie] = useState<dataMovie>()
+const [genres,setGenres] = useState([])
 const [idMovie,setIdMovie] = useState(false)
 const [loading,setLoading] = useState(true)
+const average = [1,2,3,4,5,6,7,8,9,10]
+const time = ['30','60','90','120','150','180','210']
+
+//states dos selects
+const [selectGenres,setSelectGenres] = useState()
+const [selectAverage,setSelectAverage] = useState(0)
+const [selectTime,setSelectTime] = useState(0)
+
+
+
 
 
   useEffect(() => {
@@ -42,6 +58,13 @@ const [loading,setLoading] = useState(true)
     }
      //sortedMovie()
     getMovie();
+    async function genresFc(){
+      const {data} = await axios.get(`https://api.themoviedb.org/3/genre/movie/list?api_key=c21423006a220205b03494791e5e849e`)
+      setGenres(data.genres)
+
+    }
+    genresFc()
+  
   
   }, []);
   async function getMovie(){
@@ -58,11 +81,23 @@ const [loading,setLoading] = useState(true)
     try {
       const id = (Math.random() * (10000 - 0) + 0);
       const {data} = await axios.get(`https://api.themoviedb.org/3/movie/${parseInt(id.toFixed())}?api_key=c21423006a220205b03494791e5e849e`); 
-      const popularity =  data.popularity.toFixed()   
-      if( popularity !== 30 ){
-        console.log(data.popularity)
+
+      console.log(selectTime)
+      
+      if(data.vote_average>selectAverage && data.runtime<selectTime ){
+        console.log('entrou pai')
+        setLoading(false)
+         data.genres.map((item:any)=>{
+          console.log(item.name)
+        })
         return setMovie(data)
-      }      
+        
+
+      }else{
+
+        getMovie()
+      }
+     
       
     } catch (error:any) {
       console.log(error.response.status)
@@ -76,13 +111,13 @@ const [loading,setLoading] = useState(true)
 
     }
     delay()
-    setLoading(false)
   
 
   }
   
   if(loading){
-    return <h1>carregando.....</h1>
+    return <Loading>        <AiOutlineLoading3Quarters          size={180}         style={{         color:'purple',         animation:'rotating 1.5s linear infinite',         }}/>                  <LoadingText>           Estamos buscando um filme para você 🙂       </LoadingText>
+    </Loading>
   }
 
   
@@ -94,13 +129,35 @@ const [loading,setLoading] = useState(true)
         </TitlePreferences>
         <Forms>
           <Label>Gênero:</Label>
-          <Input><option value=''>{movie?.genres}</option></Input>
+          <Input onChange={(e:any)=>setSelectGenres(e.target.value)}>
+
+          {
+            genres.map((item:any)=>(
+              <option value={item.name}>{item.name}</option>
+
+            ))
+          }
+          </Input>
           <Label>Ranking:</Label>
-          <Input><option value="">5</option></Input>
+          <Input onChange={(e:any)=>setSelectAverage(e.target.value)}>
+            {
+              average.map((item:any)=>(
+                <option value={item}>{item}</option>
+              ))
+            }
+          </Input>
           <Label>Duração em minutos:</Label>
-          <Input><option value="">{movie?.runtime}</option></Input>
+          <Input onChange={(e:any)=>setSelectTime(e.target.value)}>
+               {
+                time.map((item:any)=>(
+                  <option value={item}>{item} minutos</option>
+                ))
+              }
+          </Input>
         </Forms>
+
       </PreferenceContainer>
+
       <MoviePreferences>
         <MovieContainer>        
           <Image src={'https://image.tmdb.org/t/p/original/'+movie?.poster_path}/>
@@ -110,7 +167,18 @@ const [loading,setLoading] = useState(true)
             </Title>                        
 
         </MovieContainer>
-        <Title> Seu ranking é : {movie?.popularity.toFixed()}</Title>
+        <Title> Seu ranking é : {movie?.vote_average.toFixed(1)}</Title>
+        <Title> Duração : {movie?.runtime}</Title>
+        <div style={{display:'flex',flexDirection:'row',}}>
+
+        {
+          movie?.genres.map((item:any)=>(
+            <p style={{color:'white',marginLeft:20}}>{item.name}</p>
+
+          ))
+        }
+            </div>
+
         <Description>
           {movie?.overview}
         </Description>
