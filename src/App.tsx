@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React,{useEffect, useState} from 'react';
-import {Container,Image,Title,Description,Button, MovieContainer, Forms, Input, Label, PreferenceContainer, MoviePreferences, TitlePreferences} from './styles'
+import {Container,Image,Title,Description,Button, MovieContainer,Loading, Forms,LoadingText, Input, Label, PreferenceContainer, MoviePreferences, TitlePreferences} from './styles'
 import {AiOutlineLoading3Quarters} from 'react-icons/ai'
 
 
@@ -116,7 +116,8 @@ const [selectTime,setSelectTime] = useState(0)
   }
   
   if(loading){
-    return <Loading>        <AiOutlineLoading3Quarters          size={180}         style={{         color:'purple',         animation:'rotating 1.5s linear infinite',         }}/>                  <LoadingText>           Estamos buscando um filme para você 🙂       </LoadingText>
+    return <Loading>        
+      <LoadingText>Estamos buscando um filme para você 🙂...</LoadingText>
     </Loading>
   }
 
